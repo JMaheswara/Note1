@@ -1,0 +1,199 @@
+07.01 15:58
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Smart Grocery List</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f9f7f7, #e3f2fd);
+      padding: 20px;
+    }
+    h1 {
+      display: flex;
+      align-items: center;
+      font-size: 1.8em;
+      color: #333;
+    }
+    h1 img {
+      height: 40px;
+      width: 40px;
+      margin-right: 10px;
+    }
+    form {
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    input[type="text"], input[type="file"] {
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px;
+      font-size: 1em;
+      background: linear-gradient(to right, #42a5f5, #478ed1);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(to right, #1976d2, #1565c0);
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      opacity: 1;
+    }
+    .item.done {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .left img {
+      height: 50px;
+      width: 50px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+    .left span {
+      font-size: 1em;
+      word-break: break-word;
+    }
+    .delete-btn {
+      font-size: 1.2em;
+      cursor: pointer;
+      color: #e53935;
+      transition: transform 0.3s ease;
+    }
+    .delete-btn:hover {
+      transform: scale(1.2);
+    }
+    .fade-out {
+      opacity: 0 !important;
+      transform: translateX(100%);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABYElEQVR4nO3ZsQ2CMBRA0fO8DGOASWZDKcZJJ7kGdcVADG2AsD+P3/9gttCl1tx4KAAAAAAAA8GNb25sYAO4S4Bnc3zvAxvF1wa9gA63Wgv+MNtwAXmdkFdhPavzvYB8G2/PAeWWdktnZ1krsb7twF9swBWmg3cLOk+wT2rOALDq7S7x/3iwdR14+pN1XgOLXZDbk9I9u3wGx6Y0FZ4z9P3OCPWcODWg3T1k9uXwMN3q9vM9pME/20G1n8FHGz7tvTcPArYOeAlZ7I1fwDDNABDaVs4Ao1lnAAAAAElFTkSuQmCC" />
+    My Smart Grocery List
+  </h1>
+
+  <form id="grocery-form">
+    <input type="text" id="item-name" placeholder="Enter grocery item" required />
+    <input type="file" id="item-image" accept="image/*" />
+    <button type="submit">Add Item</button>
+  </form>
+
+  <ul id="grocery-list"></ul>
+
+  <script>
+    const form = document.getElementById('grocery-form');
+    const itemNameInput = document.getElementById('item-name');
+    const itemImageInput = document.getElementById('item-image');
+    const list = document.getElementById('grocery-list');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = itemNameInput.value.trim();
+      const file = itemImageInput.files[0];
+      if (!name) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        addItem(name, reader.result);
+      };
+      if (file) {
+        reader.readAsDataURL(file);
+      } else {
+        addItem(name, null);
+      }
+      itemNameInput.value = '';
+      itemImageInput.value = '';
+    });
+
+    function addItem(name, imgSrc) {
+      const li = document.createElement('li');
+      li.className = 'item';
+
+      const left = document.createElement('div');
+      left.className = 'left';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+
+      const img = document.createElement('img');
+      img.src = imgSrc || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAMFBMVEUAAACZmZl/f3+YmJj6+vqcnJyjo6Ompqa7u7uzs7OXl5eqqqqDg4Obm5u/v7+zs7Pz8/PCAfTWbAAAAD3RSTlMABAfT3t/j5ORob3tGvYuJfnLcmN9HAAABKklEQVRIie2VwQ6CMBBEexAYh9r+/7u2YYMkh4DWqruHZGM9NB5qBBiATfAw6k7dkHcfp+lDDHdd2NLoAOAe30RrJmC3kKlMEzkYmRoV5TqCNwVOu4Af+0YG5XYnxUor0WgLEA8Y5eZCTr0PpD31ZEFJJWAKaOhUKAxmt2a5bFnUrZAVR1cLE2XuvKZl6RPdE7vYvffD/YWsyYXc8a/UAAAAASUVORK5CYII=';
+      img.alt = 'Item';
+      img.width = 50;
+      img.height = 50;
+
+      const span = document.createElement('span');
+      span.textContent = name;
+
+      const deleteBtn = document.createElement('span');
+      deleteBtn.textContent = '️';
+      deleteBtn.className = 'delete-btn';
+
+      left.appendChild(checkbox);
+      if (imgSrc) left.appendChild(img);
+      left.appendChild(span);
+
+      li.appendChild(left);
+      li.appendChild(deleteBtn);
+      list.insertBefore(li, list.firstChild);
+
+      checkbox.addEventListener('change', () => {
+        li.classList.toggle('done');
+        list.removeChild(li);
+        if (checkbox.checked) {
+          list.appendChild(li);
+        } else {
+          list.insertBefore(li, list.firstChild);
+        }
+      });
+
+      deleteBtn.addEventListener('click', () => {
+        li.classList.add('fade-out');
+        setTimeout(() => {
+          list.removeChild(li);
+        }, 300);
+      });
+    }
+  </script>
+</body>
+</html>
